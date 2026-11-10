@@ -37,7 +37,7 @@ while [ $# -gt 0 ]; do
 		--purge) PURGE=1; shift ;;
 		--no-service) NO_SERVICE=1; shift ;;
 		--) shift; SERVICE_ARGS=$*; break ;;
-		-h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+		-h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
 		*) die "unknown option: $1 (try --help)" ;;
 	esac
 done
