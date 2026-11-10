@@ -1,4 +1,5 @@
 # herdr-autopin
+[![ci](https://github.com/Tomyail/herdr-autopin/actions/workflows/ci.yml/badge.svg)](https://github.com/Tomyail/herdr-autopin/actions/workflows/ci.yml)
 
 English | [简体中文](README.zh-CN.md)
 
