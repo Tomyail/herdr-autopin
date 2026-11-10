@@ -41,6 +41,9 @@ func (s *screens) set(t, text string) {
 
 var shown = &screens{m: map[string]string{}}
 
+// version is stamped at build time: -ldflags "-X main.version=...".
+var version = "dev"
+
 var digits = regexp.MustCompile(`\d+`)
 
 // read returns the terminal's screen once it holds still: two reads that agree
@@ -73,6 +76,7 @@ func main() {
 	log.SetFlags(log.Ltime)
 	log.SetPrefix("herdr-autopin  ")
 
+	showVersion := flag.Bool("version", false, "print the version and exit")
 	// -judge t7: run one judgment and print it, without pinning.
 	judgeOnly := flag.String("judge", "", "judge this terminal once and exit (-: {\"base\":[lines],\"now\":[lines]} on stdin)")
 	dry := flag.Bool("dry", false, "watch and judge, but never pin")
@@ -94,6 +98,10 @@ func main() {
 		return nil
 	})
 	flag.Parse()
+	if *showVersion {
+		fmt.Println(version)
+		return
+	}
 	if *judgeOnly == "-" { // two saved screens, for trying the judgment out
 		var in struct{ Base, Now []string }
 		if err := json.NewDecoder(os.Stdin).Decode(&in); err != nil {

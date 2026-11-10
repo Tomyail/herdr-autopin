@@ -47,6 +47,31 @@ What it logs:
 
 `make dev` builds it and restarts it in the background, logging to `/tmp/herdr-autopin.log`.
 
+## Install as a service
+
+macOS. The installer drops the binary in `~/.local/bin` and runs it as a LaunchAgent
+(`~/Library/LaunchAgents/com.tomyail.herdr-autopin.plist`): it starts at login and restarts
+when it exits.
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Tomyail/herdr-autopin/main/install.sh \
+  | TYPESAFE_API_KEY=... sh
+```
+
+From a checkout, `./install.sh --key ...` does the same. Flags the service should carry go after
+`--`: `./install.sh --dry -- --only herdr.space=<id>`.
+
+```sh
+./install.sh --uninstall            # stop it, keep the binary
+./install.sh --uninstall --purge    # and delete the binary
+launchctl print gui/$(id -u)/com.tomyail.herdr-autopin   # is it up
+tail -f ~/Library/Logs/herdr-autopin.log                 # what it does
+```
+
+The plist holds your API key, so it is chmod 600. Reinstalling replaces it. Prebuilt tarballs
+(darwin arm64/amd64) come from GitHub Releases; with no release yet the installer builds from source
+when Go is installed.
+
 ## Options
 
 | Flag | Default | What it does |

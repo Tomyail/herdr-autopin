@@ -45,6 +45,29 @@ go build -o herdr-autopin ./cmd/herdr-autopin
 
 `make dev` 会构建并在后台重启它，日志写到 `/tmp/herdr-autopin.log`。
 
+## 装成服务
+
+macOS。安装脚本把二进制放到 `~/.local/bin`，并注册成 LaunchAgent
+（`~/Library/LaunchAgents/com.tomyail.herdr-autopin.plist`）：登录自启，退出会自动拉起。
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/Tomyail/herdr-autopin/main/install.sh \
+  | TYPESAFE_API_KEY=... sh
+```
+
+在仓库里直接 `./install.sh --key ...` 效果相同。要传给服务的参数写在 `--` 之后：
+`./install.sh --dry -- --only herdr.space=<id>`。
+
+```sh
+./install.sh --uninstall            # 停掉服务，保留二进制
+./install.sh --uninstall --purge    # 连二进制一起删
+launchctl print gui/$(id -u)/com.tomyail.herdr-autopin   # 看是否在跑
+tail -f ~/Library/Logs/herdr-autopin.log                 # 看它做了什么
+```
+
+plist 里存着 API key，所以权限是 600。重装会覆盖它。预编译包（darwin arm64/amd64）来自
+GitHub Releases；还没有 release 时，只要装了 Go，脚本会本地编译。
+
 ## 参数
 
 | 参数 | 默认 | 作用 |
