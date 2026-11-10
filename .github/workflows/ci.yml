@@ -12,8 +12,9 @@ permissions:
 
 jobs:
   build:
-    # macOS runners are free for public repositories; they ship a current Go.
-    runs-on: macos-latest
+    # Build on Linux and cross-compile: the binary is pure Go (no cgo), and
+    # macOS runners queue for many minutes on a busy day.
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +24,9 @@ jobs:
           cache: true
 
       - name: Build
-        run: go build -trimpath -ldflags "-X main.version=${GITHUB_REF_NAME}" -o herdr-autopin ./cmd/herdr-autopin
+        run: |
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath \
+            -ldflags "-X main.version=${GITHUB_REF_NAME}" -o herdr-autopin ./cmd/herdr-autopin
 
       - name: Vet
         run: go vet ./...
@@ -45,14 +48,14 @@ jobs:
               -ldflags "-X main.version=${version}" -o "dist/${name}/herdr-autopin" ./cmd/herdr-autopin
             cp README.md LICENSE "dist/${name}/"
             tar -C dist -czf "dist/${name}.tar.gz" "${name}"
-            ( cd dist && shasum -a 256 "${name}.tar.gz" > "${name}.tar.gz.sha256" )
+            ( cd dist && sha256sum "${name}.tar.gz" > "${name}.tar.gz.sha256" )
           done
           echo "VERSION=${version}" >> "$GITHUB_ENV"
 
       - uses: actions/upload-artifact@v4
         if: github.event_name != 'pull_request'
         with:
-          name: herdr-autopin-${{ env.VERSION }}-${{ runner.os }}
+          name: herdr-autopin-${{ env.VERSION }}
           path: dist/*.tar.gz*
 
       - name: Release
